@@ -26,6 +26,8 @@ init python:
         st.wShowWindow=subprocess.SW_HIDE
         subprocess.Popen(cmd, startupinfo=st)
         persistent._MCloudBackup_no = persistent._MCloudBackup_no + 1
+        
+    mc_bak()
 
 init -990 python:
     store.mas_submod_utils.Submod(
