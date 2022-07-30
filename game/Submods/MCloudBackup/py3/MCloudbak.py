@@ -10,9 +10,6 @@ from charset_normalizer import from_path
 from webdav4.client import Client
 
 url = "https://pan.monika.love/dav"
-a="test"
-p="test"
-no=0
 
 wclient = None
 
@@ -28,25 +25,30 @@ def main():
     a = args.account
     p = args.pwd
     no = args.no
-    loadwebdav()
-    upload_file()
-
-
-def loadwebdav():
-    global wclient
     wclient = Client(base_url=url, auth=(a, p))
+    wclient.upload_file(from_path=dataDir+"/persistent", to_path='/MAS_backup/'+namer(no), overwrite=True)
+    if wclient.exists(path='/MAS_backup/persistent_{}'.format(int(no)-10)):
+        wclient.remove(path='/MAS_backup/persistent_{}'.format(int(no)-10))
+    #loadwebdav(a, p)
+    #upload_file()
+    #delete_old()
 
-def namer():
+
+#def loadwebdav(a, p):
+#    global wclient
+#    wclient = Client(base_url=url, auth=(a, p))
+#
+def namer(no):
     return "persistent_{}".format(no)
-
-def upload_file():
-    wclient.upload_file(from_path=dataDir+"/persistent", to_path='/MAS_backup/'+namer(), overwrite=True)
-
-def delete_old():
-    try:
-        wclient.remove('/MAS_backup/persistent_{}'.format(int(no)-10))
-    except:
-        pass
-
-
-main()
+#
+#def upload_file():
+#    wclient.upload_file(from_path=dataDir+"/persistent", to_path='/MAS_backup/'+namer(), overwrite=True)
+#
+#def delete_old():
+#    if wclient.exists(path='/MAS_backup/persistent_{}'.format(int(no)-10)):
+#        wclient.remove(path='/MAS_backup/persistent_{}'.format(int(no)-10))
+#
+try:
+    main()
+except:
+    pass
