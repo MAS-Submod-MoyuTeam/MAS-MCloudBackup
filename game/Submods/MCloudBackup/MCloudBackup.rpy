@@ -13,6 +13,7 @@ default persistent._MCloudBackup_no = 0
 init python:
     import subprocess
     import store
+    import datetime
     def mc_bak():
         dir = renpy.config.basedir.replace('\\', '/')+"/game/Submods/MCloudBackup/py3/dist/MCloudbak.exe"
         cmd = "\"{}\" -a \"{}\" -p \"{}\" -n {}".format(
@@ -26,6 +27,7 @@ init python:
         st.wShowWindow=subprocess.SW_HIDE
         subprocess.Popen(cmd, startupinfo=st)
         persistent._MCloudBackup_no = persistent._MCloudBackup_no + 1
+        persistent._MCloudBackup_time = datetime.datetime.now()
         
     mc_bak()
 
@@ -49,3 +51,5 @@ screen mc_info():
                 xalign 1.0 yalign 0.0
                 xoffset -10
                 style "main_menu_version"
+    textbutton "> 立刻备份":
+        action Function(mc_bak)
