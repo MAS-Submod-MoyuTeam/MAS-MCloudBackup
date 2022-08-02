@@ -41,7 +41,15 @@ init -990 python:
         version="1.0.0",
         settings_pane="mc_info",
     )
-
+init -989 python:
+    if store.mas_submod_utils.isSubmodInstalled("Submod Updater Plugin"):
+        store.sup_utils.SubmodUpdater(
+            submod="Netease Music",
+            user_name="MAS-Submod-MoyuTeam",
+            repository_name="MAS-MCloudBackup",
+            update_dir="",
+            attachment_id=None
+        )
 screen mc_info():
     vbox:
         xmaximum 800
