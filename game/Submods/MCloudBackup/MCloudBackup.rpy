@@ -14,7 +14,7 @@ init -900 python in mcb:
         'webdav_password': "hdNXNPzDr11cHBuHuvEJk31734dZHVg0"
     }
     # 旧存档过期时间，单位s
-    timeout = 86400*30
+    timeout = 60*60*24*30
     #################################
     import os
     from webdav2.client import Client
@@ -69,7 +69,7 @@ init -990 python:
         description=(
             "将你的游戏存档备份至莫盘"
         ),
-        version="1.1.0",
+        version="1.1.1",
         settings_pane="mc_info",
     )
 init -989 python:
