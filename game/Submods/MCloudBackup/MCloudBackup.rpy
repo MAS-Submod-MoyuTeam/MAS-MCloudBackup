@@ -1,35 +1,66 @@
-#################################
-# 在以下区域，将账号密码修改为你自己的
-define persistent._MCloudBackup = {
-    'a':"ni_de_zhang_hao@email.com",#你的莫盘账号
-    'pwd':"mo_pan_sheng_cheng_de_mi_ma"#莫盘生成的密码
-}
-#################################
-
 
 default persistent._MCloudBackup_time = None
 default persistent._MCloudBackup_no = 0
+init python:
+    import os
+    os.environ['REQUESTS_CA_BUNDLE'] = renpy.config.basedir + "/game/python-packages/certifi/cacert.pem"
+init -900 python in mcb:
+    #################################
+    # 在以下区域，将账号密码修改为你自己的
+    mcb_client = {
+        'webdav_hostname': "https://pan.monika.love/dav",
+        'webdav_login':    "1951548620@qq.com",
+        'webdav_root':  "/",
+        'webdav_password': "hdNXNPzDr11cHBuHuvEJk31734dZHVg0"
+    }
+    # 旧存档过期时间，单位s
+    timeout = 86400*30
+    #################################
+    import os
+    from webdav2.client import Client
+    import time
+    from store.mas_submod_utils import submod_log
+    info = submod_log.info
+
+    dataDir = os.getenv("APPDATA") + "\RenPy\Monika After Story"
+    mcb = Client(mcb_client)
+
+    def del_old():
+        baklist = mcb.list("MAS_Backup")
+        for i in baklist:
+            baklist[baklist.index(i)] = i.split("_")
+        for bak in baklist:
+            try:
+                stime = int(bak[1])
+                if (time.time() - stime) > timeout:
+                    mcb.clean("MAS_Backup/{}_{}".format(bak[0], bak[1]))
+                    info("[MCB]删除了旧存档：'{}_{}'".format(bak[0], bak[1]))
+            except:
+                continue
+    def upload():
+        try:
+            mcb.mkdir("MAS_Backup")
+        except:
+            pass
+        mcb.upload(remote_path="MAS_Backup/persistent_{}".format(time.time()) , local_path=dataDir + "/persistent")
+        info("[MCB]上传了存档：'{}_{}'".format("persistent", time.time()))
+    def upload_save():
+        if mcb.check("MAS_Backup/persistent"):
+            mcb.clean("MAS_Backup/persistent")
+        upload()
+
 
 init python:
     import subprocess
     import store
     import datetime
+    import store.mcb
     def mc_bak():
-        dir = renpy.config.basedir.replace('\\', '/')+"/game/Submods/MCloudBackup/py3/dist/MCloudbak.exe"
-        cmd = "\"{}\" -a \"{}\" -p \"{}\" -n {}".format(
-            dir,
-            persistent._MCloudBackup['a'],
-            persistent._MCloudBackup['pwd'],
-            persistent._MCloudBackup_no
-        )
-        st=subprocess.STARTUPINFO
-        st.dwFlags=subprocess.STARTF_USESHOWWINDOW
-        st.wShowWindow=subprocess.SW_HIDE
-        subprocess.Popen(cmd, startupinfo=st)
+        store.mcb.upload_save()
+        store.mcb.del_old()
         persistent._MCloudBackup_no = persistent._MCloudBackup_no + 1
         persistent._MCloudBackup_time = datetime.datetime.now()
         
-    mc_bak()
 
 init -990 python:
     store.mas_submod_utils.Submod(
@@ -38,13 +69,13 @@ init -990 python:
         description=(
             "将你的游戏存档备份至莫盘"
         ),
-        version="1.0.0",
+        version="1.1.0",
         settings_pane="mc_info",
     )
 init -989 python:
     if store.mas_submod_utils.isSubmodInstalled("Submod Updater Plugin"):
         store.sup_utils.SubmodUpdater(
-            submod="Netease Music",
+            submod="云端备份莫盘版",
             user_name="MAS-Submod-MoyuTeam",
             repository_name="MAS-MCloudBackup",
             update_dir="",
