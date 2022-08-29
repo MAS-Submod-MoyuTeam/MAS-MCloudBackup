@@ -17,13 +17,13 @@ init -900 python in mcb:
     timeout = 60*60*24*30
     #################################
     import os
-    from webdav2.client import Client
+    import webdav2
     import time
     from store.mas_submod_utils import submod_log
     info = submod_log.info
 
     dataDir = os.getenv("APPDATA") + "\RenPy\Monika After Story"
-    mcb = Client(mcb_client)
+    mcb = webdav2.client.Client(mcb_client)
 
     def del_old():
         baklist = mcb.list("MAS_Backup")
