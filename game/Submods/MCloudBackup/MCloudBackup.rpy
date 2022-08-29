@@ -30,13 +30,15 @@ init -900 python in mcb:
         for i in baklist:
             baklist[baklist.index(i)] = i.split("_")
         for bak in baklist:
+            if bak[1] == 'Backup/':
+                continue
             try:
-                stime = int(bak[1])
+                stime = float(bak[1])
                 if (time.time() - stime) > timeout:
                     mcb.clean("MAS_Backup/{}_{}".format(bak[0], bak[1]))
                     info("[MCB]删除了旧存档：'{}_{}'".format(bak[0], bak[1]))
-            except:
-                continue
+            except Exception as e:
+                submod_log.warning("[MCB]删除旧存档失败：{}".format(e))
     def upload():
         try:
             mcb.mkdir("MAS_Backup")
@@ -55,11 +57,20 @@ init python:
     import store
     import datetime
     import store.mcb
-    def mc_bak():
+    def _mc_bak():
         store.mcb.upload_save()
         store.mcb.del_old()
         persistent._MCloudBackup_no = persistent._MCloudBackup_no + 1
         persistent._MCloudBackup_time = datetime.datetime.now()
+    def mc_bak():
+        import thread
+        import threading 
+        a_thr = threading.Thread(
+            name="a_name",
+            target=_mc_bak,
+        )
+        a_thr.daemon=True
+        a_thr.start()
         
 
 init -990 python:
@@ -69,7 +80,7 @@ init -990 python:
         description=(
             "将你的游戏存档备份至莫盘"
         ),
-        version="1.1.2",
+        version="1.1.3",
         settings_pane="mc_info",
     )
 init -989 python:
