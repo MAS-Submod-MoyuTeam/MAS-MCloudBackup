@@ -69,7 +69,7 @@ init -990 python:
         description=(
             "将你的游戏存档备份至莫盘"
         ),
-        version="1.1.1",
+        version="1.1.2",
         settings_pane="mc_info",
     )
 init -989 python:
