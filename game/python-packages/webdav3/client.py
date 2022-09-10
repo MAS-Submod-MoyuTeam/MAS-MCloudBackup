@@ -9,7 +9,13 @@ from io import BufferedReader, BytesIO, FileIO
 from re import sub
 from urllib.parse import unquote, urlsplit, urlparse
 
-import lxml.etree as etree
+try:
+    from lxml import etree
+except ImportError:
+    try:
+        from xml.etree import cElementTree as etree
+    except ImportError:
+        from xml.etree import ElementTree as etree
 import requests
 from dateutil import parser as dateutil_parser
 

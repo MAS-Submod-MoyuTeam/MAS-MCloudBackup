@@ -11,7 +11,8 @@ init -900 python in mcb:
         'webdav_hostname': "https://pan.monika.love/dav",
         'webdav_login':    "1951548620@qq.com",
         'webdav_root':  "/",
-        'webdav_password': "hdNXNPzDr11cHBuHuvEJk31734dZHVg0"
+        'webdav_password': "TV7m2PNqeL8wHHBtTwAuCyruyo6CnhQw",
+        'disable_check': True
     }
     # 旧存档过期时间，单位s
     timeout = 60*60*24*30
@@ -47,8 +48,8 @@ init -900 python in mcb:
         mcb.upload(remote_path="MAS_Backup/persistent_{}".format(time.time()) , local_path=dataDir + "/persistent")
         info("[MCB]上传了存档：'{}_{}'".format("persistent", time.time()))
     def upload_save():
-        if mcb.check("MAS_Backup/persistent"):
-            mcb.clean("MAS_Backup/persistent")
+        #if mcb.check("MAS_Backup/persistent"):
+        #    mcb.clean("MAS_Backup/persistent")
         upload()
 
 
@@ -58,19 +59,17 @@ init python:
     import datetime
     import store.mcb
     def _mc_bak():
-        store.mcb.upload_save()
-        store.mcb.del_old()
-        persistent._MCloudBackup_no = persistent._MCloudBackup_no + 1
-        persistent._MCloudBackup_time = datetime.datetime.now()
+        try:
+            store.mcb.upload_save()
+            store.mcb.del_old()
+            persistent._MCloudBackup_no = persistent._MCloudBackup_no + 1
+            persistent._MCloudBackup_time = datetime.datetime.now()
+        except Exception as e:
+            renpy.notify("发生了异常，查看submod.log获取详细信息")
+            store.mas_submod_utils.submod_log.error(e)
     def mc_bak():
-        import thread
-        import threading 
-        a_thr = threading.Thread(
-            name="a_name",
-            target=_mc_bak,
-        )
-        a_thr.daemon=True
-        a_thr.start()
+        _bak = store.mas_threading.MASAsyncWrapper(_mc_bak)
+        _bak.start()
         
 
 init -990 python:
