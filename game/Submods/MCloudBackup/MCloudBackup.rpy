@@ -17,7 +17,7 @@ init -900 python in mcb:
     timeout = 60*60*24*30
     #################################
     import os
-    import webdav2.client as wc
+    import webdav3.client as wc
     import time
     from store.mas_submod_utils import submod_log
     info = submod_log.info
